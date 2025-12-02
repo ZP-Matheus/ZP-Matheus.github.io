@@ -1,0 +1,234 @@
+Política de Privacidade – Morse Translator App
+
+Blacks Software / Blacks Company
+Última atualização: 02/12/2025
+
+Esta Política de Privacidade descreve como o aplicativo Morse Translator App, pertencente à Blacks Software / Blacks Company (“nós”, “nosso”), coleta, utiliza, armazena e protege os dados dos usuários.
+
+Ao utilizar o Morse Translator App, você concorda plenamente com esta Política. Caso não concorde, recomenda-se não utilizar o aplicativo.
+
+
+---
+
+1. Informações que Coletamos
+
+1.1. Dados Coletados Automaticamente
+
+O app coleta informações técnicas automaticamente através de ferramentas de terceiros, incluindo, mas não se limitando a:
+
+Firebase Analytics
+Coleta dados de uso, desempenho do app, eventos de navegação, tempo de uso, tipo de dispositivo, sistema operacional e identificadores de analytics.
+
+Google AdMob
+Coleta identificadores de anúncios (como o Google Advertising ID - AAID), informações sobre interação com os anúncios e dados técnicos do dispositivo.
+
+Firebase Crashlytics
+Coleta relatórios de erros, logs de falhas, informações do hardware e sistema operacional no momento do crash.
+
+
+1.2. Dados Financeiros (Transações)
+
+O app oferece doação voluntária via Google Play Billing (billing-ktx).
+Nós não temos acesso direto a dados financeiros como:
+
+número de cartão
+
+nome do titular
+
+CPF
+
+conta bancária
+
+
+Toda a transação é realizada exclusivamente pela Google Play Store.
+Recebemos apenas informações anônimas sobre o status da compra (ex.: “compra concluída”, “compra reembolsada”).
+
+
+---
+
+2. Como Utilizamos as Informações
+
+Utilizamos os dados coletados para:
+
+Melhorar o funcionamento e estabilidade do app
+
+Corrigir erros
+
+Analisar uso e desempenho
+
+Exibir anúncios personalizados ou não personalizados
+
+Garantir que compras e doações funcionem corretamente
+
+Prevenir fraudes e abusos
+
+
+Não vendemos seus dados pessoais.
+
+
+---
+
+3. Bases Legais Utilizadas
+
+Para assegurar conformidade jurídica, utilizamos múltiplas bases legais previstas em leis nacionais e internacionais, como:
+
+3.1. Legislação Brasileira
+
+Lei Geral de Proteção de Dados (LGPD – Lei 13.709/2018)
+Nos baseamos nos seguintes fundamentos:
+
+Execução de contrato (art. 7º, V) – para funcionamento do app.
+
+Legítimo interesse (art. 7º, IX) – para métricas, melhorias e segurança.
+
+Consentimento (art. 7º, I) – para anúncios personalizados via AdMob.
+
+Cumprimento de obrigação legal (art. 7º, II) – quando necessário.
+
+
+
+3.2. Legislação Internacional
+
+GDPR (Regulamento Europeu de Proteção de Dados)
+Para usuários localizados na União Europeia.
+
+COPPA (EUA)
+O app não é direcionado a menores de 13 anos.
+
+Digital Markets Act (DMA – UE)
+Conformidade com transparência sobre coleta e permissão de dados.
+
+California Consumer Privacy Act (CCPA – EUA)
+Garantimos direito de acesso, retificação e exclusão de dados para usuários aplicáveis.
+
+
+
+---
+
+4. Compartilhamento de Dados
+
+Compartilhamos dados apenas com serviços essenciais ao funcionamento do app:
+
+Google Firebase (Analytics, Crashlytics)
+
+Google AdMob
+
+Google Play Billing
+
+
+Nenhum dado é compartilhado com terceiros não relacionados à operação do aplicativo.
+
+
+---
+
+5. Retenção dos Dados
+
+Os dados coletados são mantidos pelo tempo necessário para:
+
+análise de uso
+
+segurança
+
+funcionamento técnico
+
+obrigações legais
+
+
+Você pode solicitar exclusão via e-mail, respeitando as limitações tecnológicas de dados processados automaticamente por terceiros.
+
+
+---
+
+6. Segurança das Informações
+
+Implementamos medidas técnicas e administrativas para proteger seus dados, incluindo:
+
+criptografia quando aplicável
+
+uso de protocolos seguros
+
+acesso restrito
+
+auditorias internas de segurança
+
+
+Nenhum sistema é 100% seguro, mas adotamos práticas recomendadas pelo setor.
+
+
+---
+
+7. Anúncios
+
+O app utiliza Google AdMob, que pode coletar:
+
+identificadores de publicidade
+
+dados de interação com anúncios
+
+informações técnicas do dispositivo
+
+
+Você pode desativar anúncios personalizados nas configurações de privacidade da Google Play Services.
+
+
+---
+
+8. Permissões do Dispositivo
+
+O app pode solicitar permissões como:
+
+Acesso ao flash/lanterna
+
+Vibração
+
+Áudio (para emissão de bip morse)
+
+
+Nenhuma dessas permissões é usada para coleta de dados pessoais.
+Se o dispositivo não permitir certas permissões, o app poderá oferecer alternativas ou desativar funções.
+
+
+---
+
+9. Direitos do Usuário
+
+Você pode solicitar:
+
+Acesso aos dados coletados
+
+Correção de informações imprecisas
+
+Exclusão (quando aplicável)
+
+Revogação de consentimento
+
+Explicação sobre o uso dos dados
+
+
+Para exercer qualquer direito, entre em contato pelo e-mail abaixo.
+
+
+---
+
+10. Transferência Internacional de Dados
+
+Os serviços utilizados (Firebase, AdMob e Google Play Billing) podem processar dados em servidores localizados fora do Brasil, incluindo EUA e União Europeia.
+As transferências seguem padrões internacionais de proteção, conforme LGPD e GDPR.
+
+
+---
+
+11. Alterações Nesta Política
+
+Podemos atualizar esta Política de Privacidade periodicamente.
+A nova versão será publicada no aplicativo e/ou na Play Store, com data de atualização.
+
+
+---
+
+12. Contato
+
+Para dúvidas, solicitações ou exercer seus direitos:
+
+Blacks Software / Blacks Company
+E-mail: msr0@yahoo.com
