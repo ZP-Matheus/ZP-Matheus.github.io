@@ -1,106 +1,106 @@
-// Dados das modalidades ATUALIZADOS com preços de Julho/2025
 export const MODALIDADES = {
     1: {
         id: 1,
-        nome: 'Mega-Sena',
+        nome: 'MS',
         numeros: 60,
         min: 6,
         max: 20,
         precoBase: 6.00,
-        icon: '⭐',
-        desc: 'Escolha 6 a 20 números entre 01 e 60'
+        icon: '●',
+        desc: 'Selecione de 6 a 20 números (01–60)'
     },
     2: {
         id: 2,
-        nome: 'Lotofácil',
+        nome: 'LF',
         numeros: 25,
         min: 15,
         max: 20,
         precoBase: 3.50,
-        icon: '🎯',
-        desc: 'Escolha 15 a 20 números entre 01 e 25'
+        icon: '●',
+        desc: 'Selecione de 15 a 20 números (01–25)'
     },
     3: {
         id: 3,
-        nome: 'Quina',
+        nome: 'QN',
         numeros: 80,
         min: 5,
         max: 15,
         precoBase: 3.00,
-        icon: '5️⃣',
-        desc: 'Escolha 5 a 15 números entre 01 e 80'
+        icon: '●',
+        desc: 'Selecione de 5 a 15 números (01–80)'
     },
     4: {
         id: 4,
-        nome: 'Lotomania',
+        nome: 'LM',
         numeros: 100,
         min: 50,
         max: 50,
         precoBase: 3.00,
-        icon: '🎲',
-        desc: 'Escolha 50 números entre 01 e 100'
+        icon: '●',
+        desc: 'Selecione 50 números (01–100)'
     },
     5: {
         id: 5,
-        nome: 'Timemania',
+        nome: 'TM',
         numeros: 80,
         min: 10,
         max: 10,
         precoBase: 3.00,
-        icon: '⏰',
-        desc: 'Escolha 10 números entre 01 e 80'
+        icon: '●',
+        desc: 'Selecione 10 números (01–80)'
     },
     6: {
         id: 6,
-        nome: 'Dupla-Sena',
+        nome: 'DS',
         numeros: 50,
         min: 6,
         max: 15,
         precoBase: 3.00,
-        icon: '2️⃣',
-        desc: 'Escolha 6 a 15 números entre 01 e 50'
+        icon: '●',
+        desc: 'Selecione de 6 a 15 números (01–50)'
     },
     7: {
         id: 7,
-        nome: 'Loteca',
+        nome: 'LT',
         numeros: 3,
         min: 14,
         max: 14,
         precoBase: 4.00,
-        icon: '⚽',
-        desc: 'Escolha resultado para 14 jogos'
+        icon: '●',
+        desc: 'Informe resultados de 14 jogos'
     },
     8: {
         id: 8,
-        nome: 'Dia-De-Sorte',
+        nome: 'DD',
         numeros: 31,
         min: 7,
         max: 15,
         precoBase: 2.50,
-        icon: '🍀',
-        desc: 'Escolha 7 a 15 números entre 01 e 31'
+        icon: '●',
+        desc: 'Selecione de 7 a 15 números (01–31)'
     },
     9: {
         id: 9,
-        nome: '+Milionária',
+        nome: 'MM',
         numeros: 50,
         min: 6,
         max: 12,
         precoBase: 6.00,
-        icon: '💰',
-        desc: 'Escolha 6 a 12 números + 2 trevos'
+        icon: '●',
+        desc: 'Selecione 6–12 números + 2 extras'
     },
     10: {
         id: 10,
-        nome: 'Super-Sete',
+        nome: 'SS',
         numeros: 10,
         min: 7,
         max: 7,
         precoBase: 3.00,
-        icon: '7️⃣',
-        desc: 'Escolha 7 dígitos de 0 a 9'
+        icon: '●',
+        desc: 'Informe 7 dígitos (0–9)'
     }
 };
+
 
 // Tabela de preços por quantidade de números
 export const TABELA_PRECOS = {
@@ -206,4 +206,5 @@ export function calcularPrecoAposta(qtdNumeros, modalidadeId) {
     return preco;
 }
 // ... no final do arquivo, adicione:
+
 window.calcularPrecoAposta = calcularPrecoAposta;
