@@ -311,9 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 len = 12 → gerar CNPJ a partir da base completa (sem DV)
             */
 
-            const allowedLengths = [0, 9, 12];
+            const allowedLengths = [9, 12];
             if (!allowedLengths.includes(len)) {
-                showToast(`Não é possível gerar com ${len} dígitos. Digite somente 9, 12, 8 ou deixe vazio.`);
+                showToast(`Não é possível gerar com ${len} dígitos. Digite somente 9 ou 12 digitos.`);
                 return;
             }
 
