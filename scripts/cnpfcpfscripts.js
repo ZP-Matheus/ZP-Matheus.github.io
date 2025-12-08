@@ -293,21 +293,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botão GERAR
-    if (generateBtn) {
-        generateBtn.addEventListener('click', () => {
-            const rawInput = inputField.value || '';
-            const input = clean(rawInput);
-            const len = input.length;
-            let result;
+    // Botão GERAR (refeito e corrigido)
+if (generateBtn) {
+    generateBtn.addEventListener('click', () => {
+        const raw = inputField.value || '';
+        const input = clean(raw);
+        const len = input.length;
+        let result;
 
-            // ***** CORREÇÃO APLICADA AQUI *****
-            // Bloqueia qualquer tamanho que não seja 0, 8, 9 ou 12.
-            // Isso impede que 1, 2, ... 7, 10, 11, 13 e 14 caiam na geração aleatória.
-            if (len !== 0 && len !== 8 && len !== 9 && len !== 12) {
-                showToast(`Não é possível gerar. Use 9, 12 (Base) ou campo vazio. O tamanho atual é ${len}.`);
-                return;
-            }
+        /*
+            Regras definitivas:
+
+            len = 0  → gerar aleatório (50% CPF / 50% CNPJ)
+            len = 9  → gerar CPF a partir da base (sem DV)
+            len = 8  → gerar CNPJ a partir da raiz (adds 0001)
+            len = 12 → gerar CNPJ a partir da base completa (sem DV)
+        */
+
+        const allowedLengths = [0, 8, 9, 12];
+        if (!allowedLengths.includes(len)) {
+            showToast(`Não é possível gerar com ${len} dígitos. Digite somente 9, 12, 8 ou deixe vazio.`);
+            return;
+        }
+
+        // === ROTEAMENTO PRINCIPAL ===
+        if (len === 9) {
+            result = generateCPF(true, input);      // CPF base (9)
+        } else if (len === 8 || len === 12) {
+            result = generateCNPJ(true, input);     // CNPJ base (8 ou 12)
+        } else {
+            // len === 0 (campo vazio)
+            result = Math.random() < 0.5 ? generateCPF() : generateCNPJ();
+        }
+
+        inputField.value = result;
+        showResult(result, true, 'generate');
+    });
+}// Botão GERAR (refeito e corrigido)
+if (generateBtn) {
+    generateBtn.addEventListener('click', () => {
+        const raw = inputField.value || '';
+        const input = clean(raw);
+        const len = input.length;
+        let result;
+
+        /*
+            Regras definitivas:
+
+            len = 0  → gerar aleatório (50% CPF / 50% CNPJ)
+            len = 9  → gerar CPF a partir da base (sem DV)
+            len = 8  → gerar CNPJ a partir da raiz (adds 0001)
+            len = 12 → gerar CNPJ a partir da base completa (sem DV)
+        */
+
+        const allowedLengths = [0, 8, 9, 12];
+        if (!allowedLengths.includes(len)) {
+            showToast(`Não é possível gerar com ${len} dígitos. Digite somente 9, 12, 8 ou deixe vazio.`);
+            return;
+        }
+
+        // === ROTEAMENTO PRINCIPAL ===
+        if (len === 9) {
+            result = generateCPF(true, input);      // CPF base (9)
+        } else if (len === 8 || len === 12) {
+            result = generateCNPJ(true, input);     // CNPJ base (8 ou 12)
+        } else {
+            // len === 0 (campo vazio)
+            result = Math.random() < 0.5 ? generateCPF() : generateCNPJ();
+        }
+
+        inputField.value = result;
+        showResult(result, true, 'generate');
+    });
+}
 
             // Lógica de decisão baseada no tamanho do input
             if (len === 9) {
@@ -446,3 +504,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializa UI com histórico (se houver)
     updateHistoryUI();
 });
+
