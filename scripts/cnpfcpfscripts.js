@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isValid = validateCNPJ(cleanInput);
                 formatted = formatCNPJ(cleanInput);
             } else {
-                // Se o tamanho não for 11 ou 14 (será 9 ou 12), notifica que deve usar o Gerar
+                // Se o tamanho não for 11 ou 14, notifica que deve usar o Gerar
                 showToast('Para validar, use 11 (CPF) ou 14 (CNPJ) dígitos completos.');
                 return;
             }
@@ -301,7 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const len = input.length;
             let result;
 
-            // Bloqueia qualquer tamanho que não seja 0, 8, 9 ou 12
+            // ***** CORREÇÃO APLICADA AQUI *****
+            // Bloqueia qualquer tamanho que não seja 0, 8, 9 ou 12.
+            // Isso impede que 1, 2, ... 7, 10, 11, 13 e 14 caiam na geração aleatória.
             if (len !== 0 && len !== 8 && len !== 9 && len !== 12) {
                 showToast(`Não é possível gerar. Use 9, 12 (Base) ou campo vazio. O tamanho atual é ${len}.`);
                 return;
