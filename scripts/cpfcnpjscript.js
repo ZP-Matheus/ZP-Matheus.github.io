@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultCard = document.getElementById('resultCard');
     const resultStatus = document.getElementById('resultStatus');
     const resultDocument = document.getElementById('resultDocument');
-    
+
     // Botões de Ação e Utilidade
     const copyBtn = document.getElementById('copyBtn');
     const shareBtn = document.getElementById('shareBtn');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tipsBtn = document.getElementById('tipsBtn');
     const aboutBtn = document.getElementById('aboutBtn');
     const clearHistoryBtn = document.getElementById('clearHistory');
-    
+
     // Modais
     const historyModal = document.getElementById('historyModal');
     const tipsModal = document.getElementById('tipsModal');
@@ -30,17 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. LÓGICA MATEMÁTICA (PADRÃO GOVERNO BRASILEIRO - MÓDULO 11)
     // =========================================================================
 
-    const clean = (doc) => doc.replace(/\D/g, '');
+    const clean = (doc) => String(doc || '').replace(/\D/g, '');
 
     const isRepeated = (doc) => {
-        // Bloqueia números como 111.111.111-11 (matematicamente válidos, mas inválidos na regra de negócio)
+        // recebe apenas dígitos (usando clean antes)
+        if (!doc || doc.length === 0) return false;
         return doc.split('').every(char => char === doc[0]);
     };
 
     const calcDigit = (base, weights) => {
+        // base: string de dígitos; weights: array de números (mesmo tamanho que base)
         let sum = 0;
         for (let i = 0; i < base.length; i++) {
-            sum += parseInt(base[i]) * weights[i];
+            sum += parseInt(base[i], 10) * weights[i];
         }
         const remainder = sum % 11;
         return remainder < 2 ? 0 : 11 - remainder;
@@ -49,97 +51,114 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CPF ---
     const validateCPF = (cpf) => {
         const c = clean(cpf);
-        if (c.length !== 11 || isRepeated(c)) return false;
+        if (c.length !== 11) return false;
+        if (isRepeated(c)) return false;
 
-        // Pesos para o 1º dígito (10 a 2)
         const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
         const d1 = calcDigit(c.substring(0, 9), w1);
 
-        // Pesos para o 2º dígito (11 a 2)
         const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d2 = calcDigit(c.substring(0, 9) + d1, w2);
+        const d2 = calcDigit(c.substring(0, 9) + String(d1), w2);
 
         return c.slice(-2) === `${d1}${d2}`;
     };
 
-    const generateCPF = (mask = true) => {
-        const rnd = () => Math.floor(Math.random() * 10);
-        let base = Array.from({ length: 9 }, rnd).join('');
-        
-        // Garante que não gerou repetidos
-        while (isRepeated(base)) base = Array.from({ length: 9 }, rnd).join('');
-
-        const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d1 = calcDigit(base, w1);
-
-        const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d2 = calcDigit(base + d1, w2);
-
-        const cpf = `${base}${d1}${d2}`;
-        return mask ? formatCPF(cpf) : cpf;
-    };
-
-        // Atualize a função generateCPF para aceitar baseInput
+    // --- Geração de CPF (aceita baseInput: string com 9 dígitos não formatada) ---
     const generateCPF = (mask = true, baseInput = null) => {
         let base;
-        if (baseInput && baseInput.length === 9) {
-            base = baseInput; // Usa o que o usuário digitou
-        } else {
-            const rnd = () => Math.floor(Math.random() * 10);
-            base = Array.from({ length: 9 }, rnd).join('');
-            while (isRepeated(base)) base = Array.from({ length: 9 }, rnd).join('');
+        if (baseInput) {
+            const cleaned = clean(baseInput);
+            if (cleaned.length === 9) base = cleaned;
+        }
+
+        const rnd = () => Math.floor(Math.random() * 10);
+        if (!base) {
+            base = Array.from({ length: 9 }, () => rnd()).join('');
+            while (isRepeated(base)) base = Array.from({ length: 9 }, () => rnd()).join('');
         }
 
         const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
         const d1 = calcDigit(base, w1);
 
         const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d2 = calcDigit(base + d1, w2);
+        const d2 = calcDigit(base + String(d1), w2);
 
         const cpf = `${base}${d1}${d2}`;
         return mask ? formatCPF(cpf) : cpf;
     };
 
-    // Atualize a função generateCNPJ para aceitar baseInput
+    // --- CNPJ ---
+    const validateCNPJ = (cnpj) => {
+        const c = clean(cnpj);
+        if (c.length !== 14) return false;
+        if (isRepeated(c)) return false;
+
+        const base12 = c.substring(0, 12);
+        const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(base12, w1);
+
+        const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(base12 + String(d1), w2);
+
+        return c.slice(-2) === `${d1}${d2}`;
+    };
+
     const generateCNPJ = (mask = true, baseInput = null) => {
         let base;
-        
-        if (baseInput && baseInput.length === 12) {
-             base = baseInput; // Usuário deu a base completa (sem DVs)
-        } else if (baseInput && baseInput.length === 8) {
-             base = baseInput + '0001'; // Usuário deu a raiz, adicionamos filial
-        } else {
-            const rnd = () => Math.floor(Math.random() * 10);
-            let root = Array.from({ length: 8 }, rnd).join('');
+
+        if (baseInput) {
+            const cleaned = clean(baseInput);
+            if (cleaned.length === 12) {
+                base = cleaned; // base de 12 (raiz + filial sem DVs)
+            } else if (cleaned.length === 8) {
+                base = cleaned + '0001'; // raiz -> adiciona filial padrão
+            }
+        }
+
+        const rnd = () => Math.floor(Math.random() * 10);
+        if (!base) {
+            const root = Array.from({ length: 8 }, () => rnd()).join('');
             base = root + '0001';
+            while (isRepeated(base.slice(0, 8))) {
+                // evita raiz repetida (00000000, etc)
+                const newRoot = Array.from({ length: 8 }, () => rnd()).join('');
+                base = newRoot + '0001';
+            }
         }
 
         const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
         const d1 = calcDigit(base, w1);
 
         const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d2 = calcDigit(base + d1, w2);
+        const d2 = calcDigit(base + String(d1), w2);
 
         const cnpj = `${base}${d1}${d2}`;
         return mask ? formatCNPJ(cnpj) : cnpj;
     };
 
-
-    // --- Formatação ---
-    const formatCPF = (v) => v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-    const formatCNPJ = (v) => v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    // --- Formatação (sempre limpa antes) ---
+    const formatCPF = (v) => {
+        const s = clean(v);
+        return s.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    };
+    const formatCNPJ = (v) => {
+        const s = clean(v);
+        return s.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    };
 
     // =========================================================================
     // 2. LÓGICA DE INTERFACE E UTILITÁRIOS
     // =========================================================================
 
     const showToast = (msg) => {
+        if (!toast) return;
         toast.textContent = msg;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     };
 
     const updateHistoryUI = () => {
+        if (!historyList) return;
         historyList.innerHTML = '';
         if (history.length === 0) {
             historyList.innerHTML = '<p style="text-align:center; color:var(--on-surface-variant);">Nenhum histórico recente.</p>';
@@ -149,10 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
         history.forEach(item => {
             const div = document.createElement('div');
             div.style.cssText = 'padding: 10px; border-bottom: 1px solid var(--outline); display: flex; justify-content: space-between; align-items: center;';
-            
+
             const badgeColor = item.isValid ? 'var(--success)' : (item.action === 'Gerado' ? 'var(--warning)' : 'var(--error)');
             const icon = item.isValid ? 'check_circle' : (item.action === 'Gerado' ? 'auto_awesome' : 'error');
-            
+
             div.innerHTML = `
                 <div>
                     <span style="font-family: monospace; font-size: 16px; font-weight: bold;">${item.doc}</span>
@@ -180,9 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showResult = (doc, isValid, type) => {
+        if (!resultCard || !resultStatus || !resultDocument) return;
         resultCard.classList.add('visible');
         resultDocument.textContent = doc;
-        
+
         resultStatus.className = 'result-status';
         if (type === 'generate') {
             resultStatus.classList.add('status-generated');
@@ -205,102 +225,109 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
 
     // Botão VALIDAR
-    validateBtn.addEventListener('click', () => {
-        const input = inputField.value.trim();
-        const cleanInput = clean(input);
+    if (validateBtn) {
+        validateBtn.addEventListener('click', () => {
+            const input = inputField.value.trim();
+            const cleanInput = clean(input);
 
-        if (!cleanInput) {
-            showToast('Por favor, digite um número.');
-            return;
-        }
+            if (!cleanInput) {
+                showToast('Por favor, digite um número.');
+                return;
+            }
 
-        let isValid = false;
-        let formatted = input;
+            let isValid = false;
+            let formatted = input;
 
-        if (cleanInput.length === 11) {
-            isValid = validateCPF(cleanInput);
-            formatted = formatCPF(cleanInput);
-        } else if (cleanInput.length === 14) {
-            isValid = validateCNPJ(cleanInput);
-            formatted = formatCNPJ(cleanInput);
-        } else {
-            showToast('Tamanho inválido (use 11 para CPF ou 14 para CNPJ).');
-            return;
-        }
+            if (cleanInput.length === 11) {
+                isValid = validateCPF(cleanInput);
+                formatted = formatCPF(cleanInput);
+            } else if (cleanInput.length === 14) {
+                isValid = validateCNPJ(cleanInput);
+                formatted = formatCNPJ(cleanInput);
+            } else {
+                showToast('Tamanho inválido (use 11 para CPF ou 14 para CNPJ).');
+                return;
+            }
 
-        inputField.value = formatted; // Auto formata o input
-        showResult(formatted, isValid, 'validate');
-    });
+            inputField.value = formatted; // Auto formata o input
+            showResult(formatted, isValid, 'validate');
+        });
+    }
 
-        // Botão GERAR (Lógica Corrigida)
-    generateBtn.addEventListener('click', () => {
-        const input = clean(inputField.value);
-        let result;
+    // Botão GERAR
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            const rawInput = inputField.value || '';
+            const input = clean(rawInput);
+            let result;
 
-        // Lógica de decisão baseada no tamanho do input
-        if (input.length === 9) {
-            // 9 dígitos = Base de CPF (gera os 2 dígitos verificadores)
-            // Precisamos adaptar a função generateCPF para aceitar uma base
-            result = generateCPF(true, input); 
-        } else if (input.length === 12 || input.length === 8) {
-            // 8 dígitos (Raiz CNPJ) ou 12 dígitos (Base CNPJ sem DVs)
-            result = generateCNPJ(true, input);
-        } else {
-            // Se vazio ou tamanho desconhecido, sorteia um novo
-            const randomChoice = Math.random() > 0.5;
-            result = randomChoice ? generateCPF() : generateCNPJ();
-        }
+            // Lógica de decisão baseada no tamanho do input
+            if (input.length === 9) {
+                // 9 dígitos = Base de CPF (gera os 2 dígitos verificadores)
+                result = generateCPF(true, input);
+            } else if (input.length === 12 || input.length === 8) {
+                // 8 dígitos (Raiz CNPJ) ou 12 dígitos (Base CNPJ sem DVs)
+                result = generateCNPJ(true, input);
+            } else {
+                // Se vazio ou tamanho desconhecido, sorteia um novo (50/50)
+                const randomChoice = Math.random() > 0.5;
+                result = randomChoice ? generateCPF() : generateCNPJ();
+            }
 
-        inputField.value = result;
-        showResult(result, true, 'generate');
-    });
-
-
-        // Limpa o campo para mostrar que é um novo dado
-        inputField.value = result;
-        showResult(result, true, 'generate');
-    });
+            inputField.value = result;
+            showResult(result, true, 'generate');
+        });
+    }
 
     // Botão COPIAR
-    copyBtn.addEventListener('click', () => {
-        const text = resultDocument.textContent;
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(() => showToast('Copiado para a área de transferência!'));
-    });
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const text = resultDocument.textContent;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => showToast('Copiado para a área de transferência!'))
+                .catch(() => showToast('Não foi possível copiar (permissão negada).'));
+        });
+    }
 
     // Botão COMPARTILHAR
-    shareBtn.addEventListener('click', async () => {
-        const text = resultDocument.textContent;
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Valida Brasil',
-                    text: `Documento validado/gerado: ${text}`,
-                });
-            } catch (err) {
-                console.log('Compartilhamento cancelado');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+            const text = resultDocument.textContent;
+            if (!text) return;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Valida Brasil',
+                        text: `Documento validado/gerado: ${text}`,
+                    });
+                } catch (err) {
+                    console.log('Compartilhamento cancelado ou falhou', err);
+                    showToast('Compartilhamento cancelado.');
+                }
+            } else {
+                showToast('Compartilhamento não suportado neste navegador.');
             }
-        } else {
-            showToast('Compartilhamento não suportado neste navegador.');
-        }
-    });
+        });
+    }
 
     // =========================================================================
     // 4. MODAIS E CONTEÚDO (PRIVACIDADE E HISTÓRICO)
     // =========================================================================
 
     const openModal = (modal) => {
+        if (!modal) return;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Impede rolagem do fundo
     };
 
     const closeModal = (modal) => {
+        if (!modal) return;
         modal.classList.remove('active');
         document.body.style.overflow = '';
     };
 
-    // Conteúdo Dinâmico de Privacidade (Sigilo Total)
     const setupPrivacyContent = () => {
+        if (!aboutModal) return;
         const privacyContent = aboutModal.querySelector('.modal-section');
         if (privacyContent) {
             privacyContent.innerHTML = `
@@ -325,40 +352,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Eventos dos Botões de Modal
-    historyBtn.addEventListener('click', () => {
-        updateHistoryUI();
-        openModal(historyModal);
-    });
+    if (historyBtn) {
+        historyBtn.addEventListener('click', () => {
+            updateHistoryUI();
+            openModal(historyModal);
+        });
+    }
 
-    tipsBtn.addEventListener('click', () => openModal(tipsModal));
-    
-    aboutBtn.addEventListener('click', () => {
-        setupPrivacyContent();
-        openModal(aboutModal);
-    });
+    if (tipsBtn) {
+        tipsBtn.addEventListener('click', () => openModal(tipsModal));
+    }
+
+    if (aboutBtn) {
+        aboutBtn.addEventListener('click', () => {
+            setupPrivacyContent();
+            openModal(aboutModal);
+        });
+    }
 
     // Fechar Modais
     modalCloseButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            closeModal(e.target.closest('.modal'));
+            const modal = e.target.closest('.modal');
+            closeModal(modal);
         });
     });
 
     window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
+        if (e.target.classList && e.target.classList.contains('modal')) {
             closeModal(e.target);
         }
     });
 
     // Limpar Histórico
-    clearHistoryBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        history = [];
-        localStorage.removeItem('cpfCnpjHistory');
-        updateHistoryUI();
-        showToast('Histórico apagado com sucesso.');
-        if (historyModal.classList.contains('active')) {
-            updateHistoryUI(); // Atualiza visualmente se o modal estiver aberto
-        }
-    });
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            history = [];
+            localStorage.removeItem('cpfCnpjHistory');
+            updateHistoryUI();
+            showToast('Histórico apagado com sucesso.');
+        });
+    }
+
+    // Inicializa UI com histórico (se houver)
+    updateHistoryUI();
 });
