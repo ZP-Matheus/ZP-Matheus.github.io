@@ -1,7 +1,7 @@
-# Meus Projetos
+# Black's Company
 
-Bem-vindo(a) ao meu portfólio de projetos! 🎉
+Bem-vindo(a)
 
-> ⚠️ **Importante:**  
-> Para acessar corretamente a página, acesse diretamente:  
-> [https://blacks.company/index.html](https://blacks.company/index.html)
+**Importante:**  
+Para acessar corretamente o site, acesse diretamente:  
+ [https://blacks.company/index.html](https://blacks.company/index.html)
