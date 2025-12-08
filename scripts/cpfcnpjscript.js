@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let base;
         if (baseInput) {
             const cleaned = clean(baseInput);
+            // Aceita apenas se tiver 9 dígitos (base sem DVs)
             if (cleaned.length === 9) base = cleaned;
         }
 
@@ -141,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const s = clean(v);
         return s.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
     };
+    
     const formatCNPJ = (v) => {
         const s = clean(v);
         return s.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
@@ -221,7 +223,43 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // =========================================================================
-    // 3. HANDLERS DE EVENTOS
+    // 3. MÁSCARA E RESTRIÇÃO DE INPUT
+    // =========================================================================
+
+    if (inputField) {
+        inputField.addEventListener('input', (e) => {
+            let value = e.target.value;
+            // Remove tudo que não for dígito
+            const cleanedValue = value.replace(/\D/g, '');
+
+            // Restringe o tamanho máximo para 14 (o maior possível)
+            e.target.value = cleanedValue.substring(0, 14);
+        });
+
+        // Restrição de tamanho na saída (evento de foco perdido)
+        inputField.addEventListener('blur', (e) => {
+            const cleanInput = clean(e.target.value);
+            const len = cleanInput.length;
+            
+            // Aceita apenas 9, 11, 12 ou 14 dígitos (tamanhos úteis para o app)
+            if (len > 0 && len !== 9 && len !== 11 && len !== 12 && len !== 14) {
+                // Limpa o campo se o tamanho for inválido e notifica o usuário
+                e.target.value = '';
+                showToast(`Entrada inválida. Use 9, 11, 12 ou 14 dígitos. Você digitou ${len}.`);
+                return;
+            } 
+            
+            // Auto-formata se o tamanho for de um documento completo (11 ou 14)
+            if (len === 11) {
+                e.target.value = formatCPF(cleanInput);
+            } else if (len === 14) {
+                e.target.value = formatCNPJ(cleanInput);
+            }
+        });
+    }
+
+    // =========================================================================
+    // 4. HANDLERS DE EVENTOS
     // =========================================================================
 
     // Botão VALIDAR
@@ -237,15 +275,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let isValid = false;
             let formatted = input;
+            const len = cleanInput.length;
 
-            if (cleanInput.length === 11) {
+            if (len === 11) {
                 isValid = validateCPF(cleanInput);
                 formatted = formatCPF(cleanInput);
-            } else if (cleanInput.length === 14) {
+            } else if (len === 14) {
                 isValid = validateCNPJ(cleanInput);
                 formatted = formatCNPJ(cleanInput);
             } else {
-                showToast('Tamanho inválido (use 11 para CPF ou 14 para CNPJ).');
+                // Se o tamanho não for 11 ou 14, notifica que deve usar o Gerar
+                showToast('Para validar, use 11 (CPF) ou 14 (CNPJ) dígitos completos.');
                 return;
             }
 
@@ -254,24 +294,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botão GERAR
+    // Botão GERAR (refeito e corrigido)
     if (generateBtn) {
         generateBtn.addEventListener('click', () => {
-            const rawInput = inputField.value || '';
-            const input = clean(rawInput);
+            const raw = inputField.value || '';
+            const input = clean(raw);
+            const len = input.length;
             let result;
 
-            // Lógica de decisão baseada no tamanho do input
-            if (input.length === 9) {
-                // 9 dígitos = Base de CPF (gera os 2 dígitos verificadores)
-                result = generateCPF(true, input);
-            } else if (input.length === 12 || input.length === 8) {
-                // 8 dígitos (Raiz CNPJ) ou 12 dígitos (Base CNPJ sem DVs)
-                result = generateCNPJ(true, input);
+            /*
+                Regras definitivas:
+
+                len = 0  → gerar aleatório (50% CPF / 50% CNPJ)
+                len = 9  → gerar CPF a partir da base (sem DV)
+                len = 8  → gerar CNPJ a partir da raiz (adds 0001)
+                len = 12 → gerar CNPJ a partir da base completa (sem DV)
+            */
+
+            const allowedLengths = [0, 9, 12];
+            if (!allowedLengths.includes(len)) {
+                showToast(`Não é possível gerar com ${len} dígitos. Digite somente 9, 12, 8 ou deixe vazio.`);
+                return;
+            }
+
+            // === ROTEAMENTO PRINCIPAL ===
+            if (len === 9) {
+                result = generateCPF(true, input);      // CPF base (9)
+            } else if (len === 8 || len === 12) {
+                result = generateCNPJ(true, input);     // CNPJ base (8 ou 12)
             } else {
-                // Se vazio ou tamanho desconhecido, sorteia um novo (50/50)
-                const randomChoice = Math.random() > 0.5;
-                result = randomChoice ? generateCPF() : generateCNPJ();
+                // len === 0 (campo vazio)
+                result = Math.random() < 0.5 ? generateCPF() : generateCNPJ();
             }
 
             inputField.value = result;
@@ -311,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // 4. MODAIS E CONTEÚDO (PRIVACIDADE E HISTÓRICO)
+    // 5. MODAIS E CONTEÚDO (PRIVACIDADE E HISTÓRICO)
     // =========================================================================
 
     const openModal = (modal) => {
