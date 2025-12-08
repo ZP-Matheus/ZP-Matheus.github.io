@@ -137,5 +137,22 @@ const showResult=result=>{
 };
 
 // Eventos
-validateBtn.addEventListener('click',()=>{ const input=inputField.value.trim(); if(!input){ showToast('Digite um CPF ou CNPJ'); return; } showResult(validateDocument(input)); });
-generateBtn.addEventListener('click',()=>
+// Eventos
+validateBtn.addEventListener('click',()=>{ 
+    const input=inputField.value.trim(); 
+    if(!input){ 
+        showToast('Digite um CPF ou CNPJ'); 
+        return; 
+    } 
+    showResult(validateDocument(input)); 
+});
+
+// CORREÇÃO: Função de callback do generateBtn completa e fechada
+generateBtn.addEventListener('click',()=>{ 
+    const input=inputField.value.trim(); 
+    showResult(generateDocument(input)); 
+});
+// Faltam os eventos para os modais, mas vamos fechar o DOMContentLoaded para o código rodar:
+// ... (Adicione aqui os handlers para copyBtn, shareBtn, historyBtn, tipsBtn, etc., se desejar)
+
+}); // <-- FECHAMENTO FINAL: do document.addEventListener('DOMContentLoaded', ...)
