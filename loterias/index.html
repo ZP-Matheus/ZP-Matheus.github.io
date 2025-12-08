@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Loterias</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div class="header-title">
+                    <h1>
+                        🎰 Super Loterias
+                        <span class="badge">Material You</span>
+                    </h1>
+                    <p class="text-body">Aplicação completa para gerenciamento de apostas e resultados das loterias</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="btn-export" title="Exportar dados">
+                        📥
+                    </button>
+                    <button class="btn-icon" id="btn-clear" title="Limpar dados">
+                        🗑️
+                    </button>
+                    <button class="btn-icon" id="btn-logs" title="Ver logs">
+                        📋
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="text-label">Apostas Totais</div>
+                    <div class="stat-value" id="total-apostas">0</div>
+                    <div class="text-caption">Jogos registrados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-label">Modalidades</div>
+                    <div class="stat-value">10</div>
+                    <div class="text-caption">Disponíveis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-label">Última Atualização</div>
+                    <div class="stat-value" id="last-update">-</div>
+                    <div class="text-caption">Resultados</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <aside class="sidebar">
+                <nav class="nav-section">
+                    <div class="nav-title">PRINCIPAIS</div>
+                    <button class="nav-item active" data-view="home">
+                        <div class="nav-icon">🏠</div>
+                        <div class="nav-text">Início</div>
+                    </button>
+                    <button class="nav-item" data-view="resultados">
+                        <div class="nav-icon">📊</div>
+                        <div class="nav-text">Resultados</div>
+                        <div class="nav-badge">API</div>
+                    </button>
+                    <button class="nav-item" data-view="apostar">
+                        <div class="nav-icon">🎯</div>
+                        <div class="nav-text">Fazer Aposta</div>
+                        <div class="nav-badge">NOVO</div>
+                    </button>
+                </nav>
+
+                <nav class="nav-section">
+                    <div class="nav-title">APOSTAS</div>
+                    <button class="nav-item" data-view="verApostas">
+                        <div class="nav-icon">📁</div>
+                        <div class="nav-text">Ver Apostas</div>
+                        <div class="nav-badge" id="apostas-count">0</div>
+                    </button>
+                    <button class="nav-item" data-view="consultar">
+                        <div class="nav-icon">🔍</div>
+                        <div class="nav-text">Consultar Aposta</div>
+                    </button>
+                    <button class="nav-item" data-view="gerar">
+                        <div class="nav-icon">🎲</div>
+                        <div class="nav-text">Gerar Números</div>
+                    </button>
+                </nav>
+
+                <nav class="nav-section">
+                    <div class="nav-title">FERRAMENTAS</div>
+                    <button class="nav-item" data-view="calculadora">
+                        <div class="nav-icon">💰</div>
+                        <div class="nav-text">Calculadora</div>
+                    </button>
+                    <button class="nav-item" data-view="rapidinha">
+                        <div class="nav-icon">⚡</div>
+                        <div class="nav-text">Rapidinha</div>
+                    </button>
+                    <button class="nav-item" data-view="combinar">
+                        <div class="nav-icon">🔄</div>
+                        <div class="nav-text">Combinar Apostas</div>
+                    </button>
+                </nav>
+
+                <nav class="nav-section">
+                    <div class="nav-title">AJUDA</div>
+                    <button class="nav-item" data-view="guia">
+                        <div class="nav-icon">📘</div>
+                        <div class="nav-text">Guia</div>
+                    </button>
+                    <button class="nav-item" data-view="comoUsar">
+                        <div class="nav-icon">🎓</div>
+                        <div class="nav-text">Como Usar</div>
+                    </button>
+                </nav>
+            </aside>
+
+            <main class="main-content" id="content-area">
+                <!-- Conteúdo será injetado aqui via JavaScript -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="text-body">Carregando...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
