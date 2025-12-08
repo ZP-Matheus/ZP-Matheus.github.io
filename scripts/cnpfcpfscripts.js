@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // =========================================================================
-    // 3. MÁSCARA E RESTRIÇÃO DE INPUT (NOVO)
+    // 3. MÁSCARA E RESTRIÇÃO DE INPUT
     // =========================================================================
 
     if (inputField) {
@@ -301,9 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const len = input.length;
             let result;
 
-            // Lógica de proibição (NOVO): Recusa geração se o documento já estiver completo (11 ou 14)
-            if (len === 11 || len === 14) {
-                showToast('A Geração só é permitida com 9 (Base CPF), 12 (Base CNPJ) ou campo vazio.');
+            // Bloqueia qualquer tamanho que não seja 0, 8, 9 ou 12
+            if (len !== 0 && len !== 8 && len !== 9 && len !== 12) {
+                showToast(`Não é possível gerar. Use 9, 12 (Base) ou campo vazio. O tamanho atual é ${len}.`);
                 return;
             }
 
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 8 dígitos (Raiz CNPJ) ou 12 dígitos (Base CNPJ sem DVs)
                 result = generateCNPJ(true, input);
             } else {
-                // Se vazio ou tamanho desconhecido, sorteia um novo (50/50)
+                // Se vazio (len === 0), sorteia um novo (50/50)
                 const randomChoice = Math.random() > 0.5;
                 result = randomChoice ? generateCPF() : generateCNPJ();
             }
