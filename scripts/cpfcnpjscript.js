@@ -1,158 +1,342 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // === Elementos do DOM ===
+    const inputField = document.getElementById('inputField');
+    const validateBtn = document.getElementById('validateBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultCard = document.getElementById('resultCard');
+    const resultStatus = document.getElementById('resultStatus');
+    const resultDocument = document.getElementById('resultDocument');
+    
+    // Botões de Ação e Utilidade
+    const copyBtn = document.getElementById('copyBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const historyBtn = document.getElementById('historyBtn');
+    const tipsBtn = document.getElementById('tipsBtn');
+    const aboutBtn = document.getElementById('aboutBtn');
+    const clearHistoryBtn = document.getElementById('clearHistory');
+    
+    // Modais
+    const historyModal = document.getElementById('historyModal');
+    const tipsModal = document.getElementById('tipsModal');
+    const aboutModal = document.getElementById('aboutModal');
+    const modalCloseButtons = document.querySelectorAll('.modal-close');
+    const historyList = document.getElementById('historyList');
+    const toast = document.getElementById('toast');
 
-const inputField = document.getElementById('inputField');
-const validateBtn = document.getElementById('validateBtn');
-const generateBtn = document.getElementById('generateBtn');
-const resultCard = document.getElementById('resultCard');
-const resultStatus = document.getElementById('resultStatus');
-const resultDocument = document.getElementById('resultDocument');
-const copyBtn = document.getElementById('copyBtn');
-const shareBtn = document.getElementById('shareBtn');
-const historyBtn = document.getElementById('historyBtn');
-const tipsBtn = document.getElementById('tipsBtn');
-const aboutBtn = document.getElementById('aboutBtn');
-const clearHistoryBtn = document.getElementById('clearHistory');
-const toast = document.getElementById('toast');
+    // Estado da Aplicação
+    let history = JSON.parse(localStorage.getItem('cpfCnpjHistory')) || [];
 
-const historyModal = document.getElementById('historyModal');
-const tipsModal = document.getElementById('tipsModal');
-const aboutModal = document.getElementById('aboutModal');
+    // =========================================================================
+    // 1. LÓGICA MATEMÁTICA (PADRÃO GOVERNO BRASILEIRO - MÓDULO 11)
+    // =========================================================================
 
-const state = { history: [], currentResult: null };
+    const clean = (doc) => doc.replace(/\D/g, '');
 
-// === Funções utilitárias ===
-const showToast = (msg,dur=3000)=>{
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(()=>toast.classList.remove('show'), dur);
-};
+    const isRepeated = (doc) => {
+        // Bloqueia números como 111.111.111-11 (matematicamente válidos, mas inválidos na regra de negócio)
+        return doc.split('').every(char => char === doc[0]);
+    };
 
-const copyToClipboard = async (text)=>{
-    try { await navigator.clipboard.writeText(text); showToast('Copiado!'); }
-    catch { showToast('Erro ao copiar'); }
-};
+    const calcDigit = (base, weights) => {
+        let sum = 0;
+        for (let i = 0; i < base.length; i++) {
+            sum += parseInt(base[i]) * weights[i];
+        }
+        const remainder = sum % 11;
+        return remainder < 2 ? 0 : 11 - remainder;
+    };
 
-// Limpar entrada
-const cleanDocument = doc => doc.replace(/\D/g, '');
-const hasAllSameDigits = doc => doc.length>0 && [...doc].every(ch=>ch===doc[0]);
+    // --- CPF ---
+    const validateCPF = (cpf) => {
+        const c = clean(cpf);
+        if (c.length !== 11 || isRepeated(c)) return false;
 
-// CPF
-const calculateCPFDigit = (base, weightStart)=>{
-    let sum=0;
-    for(let i=0;i<base.length;i++) sum+=parseInt(base[i])*(weightStart-i);
-    const rem = sum%11;
-    return rem<2?0:11-rem;
-};
-const isValidCPF = cpf=>{
-    const n=cleanDocument(cpf);
-    if(n.length!==11 || hasAllSameDigits(n)) return false;
-    const dv1=calculateCPFDigit(n.slice(0,9),10);
-    const dv2=calculateCPFDigit(n.slice(0,9)+dv1,11);
-    return n.slice(-2)===`${dv1}${dv2}`;
-};
-const formatCPF = cpf=>{
-    const n=cleanDocument(cpf);
-    if(n.length!==11) return cpf;
-    return `${n.slice(0,3)}.${n.slice(3,6)}.${n.slice(6,9)}-${n.slice(9,11)}`;
-};
-const generateCPF = (base=null)=>{
-    if(!base) base=Array.from({length:9},()=>Math.floor(Math.random()*10)).join('');
-    const dv1=calculateCPFDigit(base,10);
-    const dv2=calculateCPFDigit(base+dv1,11);
-    return formatCPF(base+dv1+dv2);
-};
+        // Pesos para o 1º dígito (10 a 2)
+        const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(c.substring(0, 9), w1);
 
-// CNPJ
-const calculateCNPJDigit = (base, weightStart)=>{
-    let sum=0,weight=weightStart;
-    for(let i=base.length-1;i>=0;i--){
-        sum+=parseInt(base[i])*weight;
-        weight--; if(weight===1) weight=9;
-    }
-    const rem=sum%11;
-    return rem<2?0:11-rem;
-};
-const isValidCNPJ = cnpj=>{
-    const n=cleanDocument(cnpj);
-    if(n.length!==14 || hasAllSameDigits(n)) return false;
-    const dv1=calculateCNPJDigit(n.slice(0,12),5);
-    const dv2=calculateCNPJDigit(n.slice(0,12)+dv1,6);
-    return n.slice(-2)===`${dv1}${dv2}`;
-};
-const formatCNPJ = cnpj=>{
-    const n=cleanDocument(cnpj);
-    if(n.length!==14) return cnpj;
-    return `${n.slice(0,2)}.${n.slice(2,5)}.${n.slice(5,8)}/${n.slice(8,12)}-${n.slice(12,14)}`;
-};
-const generateCNPJ = (base=null)=>{
-    if(!base) base=Array.from({length:12},()=>Math.floor(Math.random()*10)).join('');
-    const dv1=calculateCNPJDigit(base,5);
-    const dv2=calculateCNPJDigit(base+dv1,6);
-    return formatCNPJ(base+dv1+dv2);
-};
+        // Pesos para o 2º dígito (11 a 2)
+        const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(c.substring(0, 9) + d1, w2);
 
-// Detectar tipo
-const detectDocumentType = input=>{
-    const cleaned=cleanDocument(input);
-    if(cleaned.length===11) return 'CPF';
-    if(cleaned.length===14) return 'CNPJ';
-    if(cleaned.length===9) return 'CPF_BASE';
-    if(cleaned.length===12) return 'CNPJ_BASE';
-    return 'UNKNOWN';
-};
+        return c.slice(-2) === `${d1}${d2}`;
+    };
 
-// Validar ou gerar
-const validateDocument = input=>{
-    const cleaned=cleanDocument(input);
-    const type=detectDocumentType(cleaned);
-    switch(type){
-        case 'CPF': return {type, isValid:isValidCPF(cleaned), formatted:formatCPF(cleaned), message:isValidCPF(cleaned)?'Válido':'Inválido'};
-        case 'CNPJ': return {type, isValid:isValidCNPJ(cleaned), formatted:formatCNPJ(cleaned), message:isValidCNPJ(cleaned)?'Válido':'Inválido'};
-        default: return {type:'UNKNOWN', isValid:false, formatted:input, message:'Digite 11 ou 14 dígitos ou base para gerar'};
-    }
-};
-const generateDocument = input=>{
-    const cleaned=cleanDocument(input);
-    const type=detectDocumentType(cleaned);
-    if(type==='CPF_BASE') return {type:'CPF', isValid:true, formatted:generateCPF(cleaned), message:'Gerado'};
-    if(type==='CNPJ_BASE') return {type:'CNPJ', isValid:true, formatted:generateCNPJ(cleaned), message:'Gerado'};
-    return Math.random()>0.5 ? {type:'CPF', isValid:true, formatted:generateCPF(), message:'Gerado'} : {type:'CNPJ', isValid:true, formatted:generateCNPJ(), message:'Gerado'};
-};
+    const generateCPF = (mask = true) => {
+        const rnd = () => Math.floor(Math.random() * 10);
+        let base = Array.from({ length: 9 }, rnd).join('');
+        
+        // Garante que não gerou repetidos
+        while (isRepeated(base)) base = Array.from({ length: 9 }, rnd).join('');
 
-// Histórico
-const loadHistory = ()=>{
-    try { const saved=localStorage.getItem('cpfCnpjHistory'); state.history=saved?JSON.parse(saved):[]; } 
-    catch { state.history=[]; }
-};
-const saveHistory = ()=>{ localStorage.setItem('cpfCnpjHistory',JSON.stringify(state.history)); };
+        const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(base, w1);
 
-const showResult=result=>{
-    resultCard.classList.add('visible');
-    resultDocument.textContent=result.formatted;
-    resultStatus.className='result-status';
-    resultStatus.classList.add(result.message==='Válido'?'status-valid':result.message==='Inválido'?'status-invalid':'status-generated');
-    resultStatus.textContent=`${result.message} - ${result.type}`;
-    if(result.type!=='UNKNOWN'){ state.history.unshift({...result, timestamp:Date.now()}); state.history=state.history.slice(0,50); saveHistory(); }
-    state.currentResult=result;
-};
+        const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(base + d1, w2);
 
-// Eventos
-// Eventos
-validateBtn.addEventListener('click',()=>{ 
-    const input=inputField.value.trim(); 
-    if(!input){ 
-        showToast('Digite um CPF ou CNPJ'); 
-        return; 
-    } 
-    showResult(validateDocument(input)); 
+        const cpf = `${base}${d1}${d2}`;
+        return mask ? formatCPF(cpf) : cpf;
+    };
+
+    // --- CNPJ ---
+    const validateCNPJ = (cnpj) => {
+        const c = clean(cnpj);
+        if (c.length !== 14 || isRepeated(c)) return false;
+
+        // Pesos 1º dígito: 5,4,3,2,9,8,7,6,5,4,3,2
+        const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(c.substring(0, 12), w1);
+
+        // Pesos 2º dígito: 6,5,4,3,2,9,8,7,6,5,4,3,2
+        const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(c.substring(0, 12) + d1, w2);
+
+        return c.slice(-2) === `${d1}${d2}`;
+    };
+
+    const generateCNPJ = (mask = true) => {
+        const rnd = () => Math.floor(Math.random() * 10);
+        let base = Array.from({ length: 8 }, rnd).join(''); // Raiz
+        base += '0001'; // Sufixo padrão de matriz
+
+        const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(base, w1);
+
+        const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(base + d1, w2);
+
+        const cnpj = `${base}${d1}${d2}`;
+        return mask ? formatCNPJ(cnpj) : cnpj;
+    };
+
+    // --- Formatação ---
+    const formatCPF = (v) => v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    const formatCNPJ = (v) => v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+
+    // =========================================================================
+    // 2. LÓGICA DE INTERFACE E UTILITÁRIOS
+    // =========================================================================
+
+    const showToast = (msg) => {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    };
+
+    const updateHistoryUI = () => {
+        historyList.innerHTML = '';
+        if (history.length === 0) {
+            historyList.innerHTML = '<p style="text-align:center; color:var(--on-surface-variant);">Nenhum histórico recente.</p>';
+            return;
+        }
+
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = 'padding: 10px; border-bottom: 1px solid var(--outline); display: flex; justify-content: space-between; align-items: center;';
+            
+            const badgeColor = item.isValid ? 'var(--success)' : (item.action === 'Gerado' ? 'var(--warning)' : 'var(--error)');
+            const icon = item.isValid ? 'check_circle' : (item.action === 'Gerado' ? 'auto_awesome' : 'error');
+            
+            div.innerHTML = `
+                <div>
+                    <span style="font-family: monospace; font-size: 16px; font-weight: bold;">${item.doc}</span>
+                    <div style="font-size: 12px; color: var(--on-surface-variant);">${new Date(item.date).toLocaleString()}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px; color:${badgeColor}; font-weight:600; font-size:14px;">
+                    <i class="material-icons" style="font-size:16px">${icon}</i>
+                    ${item.action}
+                </div>
+            `;
+            historyList.appendChild(div);
+        });
+    };
+
+    const addToHistory = (doc, isValid, action) => {
+        const newItem = {
+            doc,
+            isValid,
+            action: isValid ? (action === 'validate' ? 'Válido' : 'Gerado') : 'Inválido',
+            date: Date.now()
+        };
+        history.unshift(newItem);
+        if (history.length > 50) history.pop(); // Mantém apenas os últimos 50
+        localStorage.setItem('cpfCnpjHistory', JSON.stringify(history));
+    };
+
+    const showResult = (doc, isValid, type) => {
+        resultCard.classList.add('visible');
+        resultDocument.textContent = doc;
+        
+        resultStatus.className = 'result-status';
+        if (type === 'generate') {
+            resultStatus.classList.add('status-generated');
+            resultStatus.textContent = 'Documento Gerado';
+            addToHistory(doc, true, 'generate');
+        } else {
+            if (isValid) {
+                resultStatus.classList.add('status-valid');
+                resultStatus.innerHTML = '<i class="material-icons" style="vertical-align:bottom; font-size:18px">check</i> Documento Válido';
+            } else {
+                resultStatus.classList.add('status-invalid');
+                resultStatus.innerHTML = '<i class="material-icons" style="vertical-align:bottom; font-size:18px">close</i> Documento Inválido';
+            }
+            addToHistory(doc, isValid, 'validate');
+        }
+    };
+
+    // =========================================================================
+    // 3. HANDLERS DE EVENTOS
+    // =========================================================================
+
+    // Botão VALIDAR
+    validateBtn.addEventListener('click', () => {
+        const input = inputField.value.trim();
+        const cleanInput = clean(input);
+
+        if (!cleanInput) {
+            showToast('Por favor, digite um número.');
+            return;
+        }
+
+        let isValid = false;
+        let formatted = input;
+
+        if (cleanInput.length === 11) {
+            isValid = validateCPF(cleanInput);
+            formatted = formatCPF(cleanInput);
+        } else if (cleanInput.length === 14) {
+            isValid = validateCNPJ(cleanInput);
+            formatted = formatCNPJ(cleanInput);
+        } else {
+            showToast('Tamanho inválido (use 11 para CPF ou 14 para CNPJ).');
+            return;
+        }
+
+        inputField.value = formatted; // Auto formata o input
+        showResult(formatted, isValid, 'validate');
+    });
+
+    // Botão GERAR (Lógica consertada)
+    generateBtn.addEventListener('click', () => {
+        // Decide aleatoriamente se gera CPF ou CNPJ se o campo estiver vazio
+        // Se o usuário digitou algo, tentamos inferir a intenção
+        const input = clean(inputField.value);
+        let result;
+
+        if (input.length === 12 || input.length === 8) {
+            // Intenção de CNPJ (Raiz 8 ou Base 12)
+             result = generateCNPJ();
+        } else {
+            // Padrão ou Intenção de CPF
+            // Se estiver vazio, 50% de chance para cada, ou padrão CPF
+            const randomChoice = Math.random() > 0.5;
+            result = randomChoice ? generateCPF() : generateCNPJ();
+        }
+
+        // Limpa o campo para mostrar que é um novo dado
+        inputField.value = result;
+        showResult(result, true, 'generate');
+    });
+
+    // Botão COPIAR
+    copyBtn.addEventListener('click', () => {
+        const text = resultDocument.textContent;
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => showToast('Copiado para a área de transferência!'));
+    });
+
+    // Botão COMPARTILHAR
+    shareBtn.addEventListener('click', async () => {
+        const text = resultDocument.textContent;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Valida Brasil',
+                    text: `Documento validado/gerado: ${text}`,
+                });
+            } catch (err) {
+                console.log('Compartilhamento cancelado');
+            }
+        } else {
+            showToast('Compartilhamento não suportado neste navegador.');
+        }
+    });
+
+    // =========================================================================
+    // 4. MODAIS E CONTEÚDO (PRIVACIDADE E HISTÓRICO)
+    // =========================================================================
+
+    const openModal = (modal) => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Impede rolagem do fundo
+    };
+
+    const closeModal = (modal) => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    // Conteúdo Dinâmico de Privacidade (Sigilo Total)
+    const setupPrivacyContent = () => {
+        const privacyContent = aboutModal.querySelector('.modal-section');
+        if (privacyContent) {
+            privacyContent.innerHTML = `
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--success); margin-bottom: 20px;">
+                    <h3 style="color: var(--success); margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                        <i class="material-icons">security</i> SIGILO TOTAL GARANTIDO
+                    </h3>
+                    <p style="color: var(--on-surface); font-weight: 500;">
+                        NENHUM dado é enviado para a internet.
+                    </p>
+                </div>
+                <h3>Como funciona a segurança?</h3>
+                <p>Este aplicativo opera 100% no seu navegador (Client-Side).</p>
+                <ul style="margin-left: 20px; color: var(--on-surface-variant); margin-bottom: 15px;">
+                    <li>O código de validação roda apenas no seu celular/computador.</li>
+                    <li>Não possuímos banco de dados nem servidores de armazenamento.</li>
+                    <li>O histórico fica salvo apenas na memória temporária do seu navegador (LocalStorage) e você pode apagá-lo a qualquer momento.</li>
+                </ul>
+                <p>Sinta-se seguro para validar documentos fiscais aqui.</p>
+            `;
+        }
+    };
+
+    // Eventos dos Botões de Modal
+    historyBtn.addEventListener('click', () => {
+        updateHistoryUI();
+        openModal(historyModal);
+    });
+
+    tipsBtn.addEventListener('click', () => openModal(tipsModal));
+    
+    aboutBtn.addEventListener('click', () => {
+        setupPrivacyContent();
+        openModal(aboutModal);
+    });
+
+    // Fechar Modais
+    modalCloseButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            closeModal(e.target.closest('.modal'));
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target);
+        }
+    });
+
+    // Limpar Histórico
+    clearHistoryBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        history = [];
+        localStorage.removeItem('cpfCnpjHistory');
+        updateHistoryUI();
+        showToast('Histórico apagado com sucesso.');
+        if (historyModal.classList.contains('active')) {
+            updateHistoryUI(); // Atualiza visualmente se o modal estiver aberto
+        }
+    });
 });
-
-// CORREÇÃO: Função de callback do generateBtn completa e fechada
-generateBtn.addEventListener('click',()=>{ 
-    const input=inputField.value.trim(); 
-    showResult(generateDocument(input)); 
-});
-// Faltam os eventos para os modais, mas vamos fechar o DOMContentLoaded para o código rodar:
-// ... (Adicione aqui os handlers para copyBtn, shareBtn, historyBtn, tipsBtn, etc., se desejar)
-
-}); // <-- FECHAMENTO FINAL: do document.addEventListener('DOMContentLoaded', ...)
