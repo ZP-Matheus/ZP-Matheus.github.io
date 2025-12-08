@@ -79,26 +79,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return mask ? formatCPF(cpf) : cpf;
     };
 
-    // --- CNPJ ---
-    const validateCNPJ = (cnpj) => {
-        const c = clean(cnpj);
-        if (c.length !== 14 || isRepeated(c)) return false;
+        // Atualize a função generateCPF para aceitar baseInput
+    const generateCPF = (mask = true, baseInput = null) => {
+        let base;
+        if (baseInput && baseInput.length === 9) {
+            base = baseInput; // Usa o que o usuário digitou
+        } else {
+            const rnd = () => Math.floor(Math.random() * 10);
+            base = Array.from({ length: 9 }, rnd).join('');
+            while (isRepeated(base)) base = Array.from({ length: 9 }, rnd).join('');
+        }
 
-        // Pesos 1º dígito: 5,4,3,2,9,8,7,6,5,4,3,2
-        const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d1 = calcDigit(c.substring(0, 12), w1);
+        const w1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d1 = calcDigit(base, w1);
 
-        // Pesos 2º dígito: 6,5,4,3,2,9,8,7,6,5,4,3,2
-        const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        const d2 = calcDigit(c.substring(0, 12) + d1, w2);
+        const w2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const d2 = calcDigit(base + d1, w2);
 
-        return c.slice(-2) === `${d1}${d2}`;
+        const cpf = `${base}${d1}${d2}`;
+        return mask ? formatCPF(cpf) : cpf;
     };
 
-    const generateCNPJ = (mask = true) => {
-        const rnd = () => Math.floor(Math.random() * 10);
-        let base = Array.from({ length: 8 }, rnd).join(''); // Raiz
-        base += '0001'; // Sufixo padrão de matriz
+    // Atualize a função generateCNPJ para aceitar baseInput
+    const generateCNPJ = (mask = true, baseInput = null) => {
+        let base;
+        
+        if (baseInput && baseInput.length === 12) {
+             base = baseInput; // Usuário deu a base completa (sem DVs)
+        } else if (baseInput && baseInput.length === 8) {
+             base = baseInput + '0001'; // Usuário deu a raiz, adicionamos filial
+        } else {
+            const rnd = () => Math.floor(Math.random() * 10);
+            let root = Array.from({ length: 8 }, rnd).join('');
+            base = root + '0001';
+        }
 
         const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
         const d1 = calcDigit(base, w1);
@@ -109,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cnpj = `${base}${d1}${d2}`;
         return mask ? formatCNPJ(cnpj) : cnpj;
     };
+
 
     // --- Formatação ---
     const formatCPF = (v) => v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
@@ -217,22 +232,29 @@ document.addEventListener('DOMContentLoaded', () => {
         showResult(formatted, isValid, 'validate');
     });
 
-    // Botão GERAR (Lógica consertada)
+        // Botão GERAR (Lógica Corrigida)
     generateBtn.addEventListener('click', () => {
-        // Decide aleatoriamente se gera CPF ou CNPJ se o campo estiver vazio
-        // Se o usuário digitou algo, tentamos inferir a intenção
         const input = clean(inputField.value);
         let result;
 
-        if (input.length === 12 || input.length === 8) {
-            // Intenção de CNPJ (Raiz 8 ou Base 12)
-             result = generateCNPJ();
+        // Lógica de decisão baseada no tamanho do input
+        if (input.length === 9) {
+            // 9 dígitos = Base de CPF (gera os 2 dígitos verificadores)
+            // Precisamos adaptar a função generateCPF para aceitar uma base
+            result = generateCPF(true, input); 
+        } else if (input.length === 12 || input.length === 8) {
+            // 8 dígitos (Raiz CNPJ) ou 12 dígitos (Base CNPJ sem DVs)
+            result = generateCNPJ(true, input);
         } else {
-            // Padrão ou Intenção de CPF
-            // Se estiver vazio, 50% de chance para cada, ou padrão CPF
+            // Se vazio ou tamanho desconhecido, sorteia um novo
             const randomChoice = Math.random() > 0.5;
             result = randomChoice ? generateCPF() : generateCNPJ();
         }
+
+        inputField.value = result;
+        showResult(result, true, 'generate');
+    });
+
 
         // Limpa o campo para mostrar que é um novo dado
         inputField.value = result;
