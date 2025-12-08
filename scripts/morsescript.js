@@ -1,3 +1,4 @@
+// Mapeamento Morse
 const DOT = 200, DASH = 600, S = 200, L = 600, W = 1000;
 
 const MAP = {
@@ -12,33 +13,64 @@ const MAP = {
 const REV = Object.fromEntries(Object.entries(MAP).map(([k,v])=>[v,k]));
 REV["/"] = " ";
 
+// Função utilitária para selecionar elemento por ID
 const $ = id => document.getElementById(id);
-let dir = "t2m", ctx;
 
-$("input").addEventListener("input", update);
+// Estado
+let dir = "t2m";
+let ctx = null;
 
+// Elementos
+const inputEl = $("input");
+const outputEl = $("output");
+const btnT2M = $("btn-t2m");
+const btnM2T = $("btn-m2t");
+const btnPlay = $("btn-play");
+const btnCopy = $("btn-copy");
+const btnClear = $("btn-clear");
+const btnGuide = $("btn-guide");
+const guideBox = $("guide-box");
+const snack = $("snack");
+const labelInput = $("label-input");
+const labelOutput = $("label-output");
+
+// Eventos
+inputEl.addEventListener("input", update);
+btnT2M.addEventListener("click", () => setDir("t2m"));
+btnM2T.addEventListener("click", () => setDir("m2t"));
+btnPlay.addEventListener("click", playMorse);
+btnClear.addEventListener("click", () => {
+  inputEl.value = "";
+  outputEl.value = "";
+});
+btnCopy.addEventListener("click", async () => {
+  await navigator.clipboard.writeText(outputEl.value);
+  showSnack("Copiado");
+});
+btnGuide.addEventListener("click", () => {
+  guideBox.style.display = guideBox.style.display === "none" ? "block" : "none";
+});
+
+// Funções
 function update() {
-  $("output").value = dir === "t2m"
-    ? [...$("input").value.toUpperCase()].map(c => c === " " ? " / " : MAP[c] || "?").join(" ")
-    : $("input").value.trim().split(/\s+/).map(c => REV[c] || "?").join("");
+  outputEl.value = dir === "t2m"
+    ? [...inputEl.value.toUpperCase()].map(c => c === " " ? " / " : MAP[c] || "?").join(" ")
+    : inputEl.value.trim().split(/\s+/).map(c => REV[c] || "?").join("");
 }
-
-$("btn-t2m").addEventListener("click", () => setDir("t2m"));
-$("btn-m2t").addEventListener("click", () => setDir("m2t"));
 
 function setDir(d) {
   dir = d;
-  $("btn-t2m").classList.toggle("active", d === "t2m");
-  $("btn-m2t").classList.toggle("active", d === "m2t");
-  $("label-input").textContent = d === "t2m" ? "Digite o texto" : "Digite o código Morse";
-  $("label-output").textContent = d === "t2m" ? "Código Morse" : "Texto traduzido";
+  btnT2M.classList.toggle("active", d === "t2m");
+  btnM2T.classList.toggle("active", d === "m2t");
+  labelInput.textContent = d === "t2m" ? "Digite o texto" : "Digite o código Morse";
+  labelOutput.textContent = d === "t2m" ? "Código Morse" : "Texto traduzido";
   update();
 }
 
-$("btn-play").addEventListener("click", async () => {
-  if (!$("output").value) return msg("Nada pra tocar");
+async function playMorse() {
+  if (!outputEl.value) return showSnack("Nada pra tocar");
   ctx ??= new AudioContext();
-  for (const word of $("output").value.split(" ")) {
+  for (const word of outputEl.value.split(" ")) {
     if (word === "/") { await pause(W); continue; }
     for (const c of word) {
       tone(c === "." ? DOT : DASH);
@@ -47,33 +79,22 @@ $("btn-play").addEventListener("click", async () => {
     }
     await pause(L);
   }
-});
-
-function tone(ms) {
-  const o = ctx.createOscillator(), g = ctx.createGain();
-  o.connect(g); g.connect(ctx.destination);
-  g.gain.value = 0.25; o.start(); o.stop(ctx.currentTime + ms / 1000);
 }
 
-const pause = ms => new Promise(r => setTimeout(r, ms));
+function tone(ms) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  gain.gain.value = 0.25;
+  osc.start();
+  osc.stop(ctx.currentTime + ms / 1000);
+}
 
-$("btn-clear").addEventListener("click", () => {
-  $("input").value = "";
-  $("output").value = "";
-});
+const pause = ms => new Promise(res => setTimeout(res, ms));
 
-$("btn-copy").addEventListener("click", async () => {
-  await navigator.clipboard.writeText($("output").value);
-  msg("Copiado");
-});
-
-$("btn-guide").addEventListener("click", () => {
-  $("guide-box").style.display = $("guide-box").style.display === "none" ? "block" : "none";
-});
-
-function msg(t) {
-  const s = $("snack"); 
-  s.textContent = t; 
-  s.classList.add("show");
-  setTimeout(() => s.classList.remove("show"), 2200);
+function showSnack(msgText) {
+  snack.textContent = msgText;
+  snack.classList.add("show");
+  setTimeout(() => snack.classList.remove("show"), 2200);
 }
