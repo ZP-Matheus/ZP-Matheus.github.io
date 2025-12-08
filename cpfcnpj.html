@@ -1,116 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valida Brasil - Validador de CPF/CNPJ</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/cpfcnpjstyles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valida Brasil - Validador de CPF/CNPJ</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="app-header">
-            <div class="app-icon">
-                <i class="material-icons">verified_user</i>
-            </div>
-            <h1 class="app-title">Valida Brasil</h1>
-            <p class="app-subtitle">Valide e gere documentos em segundos</p>
-        </header>
 
-        <div class="main-card">
-            <div class="input-section">
-                <label class="input-label">Digite um CPF ou CNPJ</label>
-                <input type="text" id="inputField" class="text-input" placeholder="Ex: 123.456.789-09 ou 12.345.678/0001-95" maxlength="18">
-                <div class="action-buttons">
-                    <button id="validateBtn" class="btn btn-primary">
-                        <i class="material-icons">check_circle</i>
-                        Validar
-                    </button>
-                    <button id="generateBtn" class="btn btn-secondary">
-                        <i class="material-icons">auto_awesome</i>
-                        Gerar
-                    </button>
-                </div>
-            </div>
+<div class="container">
 
-            <div id="resultCard" class="result-card">
-                <div id="resultStatus" class="result-status"></div>
-                <div id="resultDocument" class="result-document"></div>
-                <div class="result-actions">
-                    <button id="copyBtn" class="btn-outline">
-                        <i class="material-icons">content_copy</i>Copiar
-                    </button>
-                    <button id="shareBtn" class="btn-outline">
-                        <i class="material-icons">share</i>Compartilhar
-                    </button>
-                </div>
-            </div>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-icon">
+            <i class="material-icons">verified_user</i>
+        </div>
+        <h1 class="app-title">Valida Brasil</h1>
+        <p class="app-subtitle">Valide e gere documentos em segundos</p>
+    </header>
 
-            <div class="utility-buttons">
-                <button id="historyBtn" class="btn-utility"><i class="material-icons">history</i>Histórico</button>
-                <button id="tipsBtn" class="btn-utility"><i class="material-icons">info</i>Dicas</button>
-                <button id="aboutBtn" class="btn-utility"><i class="material-icons">privacy_tip</i>Privacidade</button>
+    <!-- Main Card -->
+    <div class="main-card">
+        <div class="input-section">
+            <label class="input-label">Digite um CPF ou CNPJ</label>
+            <input type="text" id="inputField" class="text-input" placeholder="Ex: 123.456.789-09 ou 12.345.678/0001-95" maxlength="18">
+            <div class="action-buttons">
+                <button id="validateBtn" class="btn btn-primary"><i class="material-icons">check_circle</i> Validar</button>
+                <button id="generateBtn" class="btn btn-secondary"><i class="material-icons">auto_awesome</i> Gerar</button>
             </div>
         </div>
 
-        <footer class="footer">
-            <p>Aplicação para fins educacionais e de teste</p>
-            <div class="footer-links">
-                <a href="#" class="footer-link" id="clearHistory">Limpar Histórico</a>
-                <a href="#" class="footer-link" id="donateLink">Apoiar Projeto</a>
+        <div id="resultCard" class="result-card">
+            <div id="resultStatus" class="result-status"></div>
+            <div id="resultDocument" class="result-document"></div>
+            <div class="result-actions">
+                <button id="copyBtn" class="btn-outline"><i class="material-icons">content_copy</i> Copiar</button>
+                <button id="shareBtn" class="btn-outline"><i class="material-icons">share</i> Compartilhar</button>
             </div>
-        </footer>
-    </div>
+        </div>
 
-    <div id="toast" class="toast"></div>
-
-    <!-- Modais -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Histórico de Consultas</h2>
-                <button class="modal-close" id="closeHistoryModal">&times;</button>
-            </div>
-            <div id="historyList" class="modal-section"></div>
+        <div class="utility-buttons">
+            <button id="historyBtn" class="btn-utility"><i class="material-icons">history</i> Histórico</button>
+            <button id="tipsBtn" class="btn-utility"><i class="material-icons">info</i> Dicas</button>
+            <button id="aboutBtn" class="btn-utility"><i class="material-icons">privacy_tip</i> Privacidade</button>
         </div>
     </div>
 
-    <div id="tipsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Dicas e Como Usar</h2>
-                <button class="modal-close" id="closeTipsModal">&times;</button>
-            </div>
-            <div class="modal-section">
-                <h3>1. Validar CPF ou CNPJ</h3>
-                <p>Digite o número completo (11 dígitos para CPF, 14 para CNPJ) no campo de texto.</p>
-                <p>Clique em "Validar" para checar a validade matemática dos dígitos verificadores.</p>
-            </div>
-            <div class="modal-section">
-                <h3>2. Gerar CPF ou CNPJ</h3>
-                <p>Digite a base (9 dígitos para CPF, 12 para CNPJ) e clique em "Gerar".</p>
-            </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Aplicação para fins educacionais e de teste</p>
+        <div class="footer-links">
+            <a href="#" class="footer-link" id="clearHistory">Limpar Histórico</a>
+            <a href="#" class="footer-link" id="donateLink">Apoiar Projeto</a>
+        </div>
+    </footer>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Modais -->
+<div id="historyModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Histórico de Consultas</h2>
+            <button class="modal-close" id="closeHistoryModal">&times;</button>
+        </div>
+        <div id="historyList" class="modal-section"></div>
+    </div>
+</div>
+
+<div id="tipsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Dicas e Como Usar</h2>
+            <button class="modal-close" id="closeTipsModal">&times;</button>
+        </div>
+        <div class="modal-section">
+            <h3>1. Validar CPF ou CNPJ</h3>
+            <p>Digite o número completo (11 dígitos para CPF, 14 para CNPJ).</p>
+            <p>O app ignora pontos, traços e barras automaticamente.</p>
+            <p>Clique em "Validar" para checar a validade.</p>
+        </div>
+        <div class="modal-section">
+            <h3>2. Gerar CPF ou CNPJ</h3>
+            <p>Digite 9 dígitos (CPF) ou 12 dígitos (CNPJ) e clique em "Gerar".</p>
         </div>
     </div>
+</div>
 
-    <div id="aboutModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Privacidade e Termos</h2>
-                <button class="modal-close" id="closeAboutModal">&times;</button>
-            </div>
-            <div class="modal-section">
-                <h3>Política de Privacidade</h3>
-                <p>Este app não coleta dados pessoais. Tudo é feito localmente.</p>
-            </div>
-            <div class="modal-section">
-                <h3>Termos de Uso</h3>
-                <p>Documento gerado é matematicamente válido, mas não oficial.</p>
-            </div>
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Privacidade e Termos</h2>
+            <button class="modal-close" id="closeAboutModal">&times;</button>
+        </div>
+        <div class="modal-section">
+            <h3>Política de Privacidade</h3>
+            <p>Este app não coleta dados pessoais. Operações são locais.</p>
         </div>
     </div>
+</div>
 
-    <script type="module" src="scripts/cpfcnpjscript.js"></script>
+<script type="module" src="styles/cpfcnpjstyles.css"></script>
 </body>
 </html>
