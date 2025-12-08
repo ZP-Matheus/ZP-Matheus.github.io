@@ -6,7 +6,7 @@ export const MODALIDADES = {
         min: 6,
         max: 20,
         precoBase: 6.00,
-        icon: '●',
+        icon: '⭐',
         desc: 'Selecione de 6 a 20 números (01–60)'
     },
     2: {
@@ -16,7 +16,7 @@ export const MODALIDADES = {
         min: 15,
         max: 20,
         precoBase: 3.50,
-        icon: '●',
+        icon: '🎯',
         desc: 'Selecione de 15 a 20 números (01–25)'
     },
     3: {
@@ -26,7 +26,7 @@ export const MODALIDADES = {
         min: 5,
         max: 15,
         precoBase: 3.00,
-        icon: '●',
+        icon: '5️⃣',
         desc: 'Selecione de 5 a 15 números (01–80)'
     },
     4: {
@@ -36,7 +36,7 @@ export const MODALIDADES = {
         min: 50,
         max: 50,
         precoBase: 3.00,
-        icon: '●',
+        icon: '🎲',
         desc: 'Selecione 50 números (01–100)'
     },
     5: {
@@ -46,7 +46,7 @@ export const MODALIDADES = {
         min: 10,
         max: 10,
         precoBase: 3.00,
-        icon: '●',
+        icon: '⏱️',
         desc: 'Selecione 10 números (01–80)'
     },
     6: {
@@ -56,7 +56,7 @@ export const MODALIDADES = {
         min: 6,
         max: 15,
         precoBase: 3.00,
-        icon: '●',
+        icon: '2️⃣',
         desc: 'Selecione de 6 a 15 números (01–50)'
     },
     7: {
@@ -66,7 +66,7 @@ export const MODALIDADES = {
         min: 14,
         max: 14,
         precoBase: 4.00,
-        icon: '●',
+        icon: '⚽',
         desc: 'Informe resultados de 14 jogos'
     },
     8: {
@@ -76,7 +76,7 @@ export const MODALIDADES = {
         min: 7,
         max: 15,
         precoBase: 2.50,
-        icon: '●',
+        icon: '🍀',
         desc: 'Selecione de 7 a 15 números (01–31)'
     },
     9: {
@@ -86,7 +86,7 @@ export const MODALIDADES = {
         min: 6,
         max: 12,
         precoBase: 6.00,
-        icon: '●',
+        icon: '💰',
         desc: 'Selecione 6–12 números + 2 extras'
     },
     10: {
@@ -96,10 +96,11 @@ export const MODALIDADES = {
         min: 7,
         max: 7,
         precoBase: 3.00,
-        icon: '●',
+        icon: '7️⃣',
         desc: 'Informe 7 dígitos (0–9)'
     }
 };
+
 
 
 // Tabela de preços por quantidade de números
@@ -208,3 +209,4 @@ export function calcularPrecoAposta(qtdNumeros, modalidadeId) {
 // ... no final do arquivo, adicione:
 
 window.calcularPrecoAposta = calcularPrecoAposta;
+
